@@ -1,0 +1,7 @@
+FROM node:16
+
+WORKDIR "/usr/src/app"
+RUN npm i nodemon -g
+EXPOSE 3000 9229 9222
+
+CMD ["nodemon", "--max-old-space-size=2048","--inspect=0.0.0.0:9229", "./dist/index.js"]

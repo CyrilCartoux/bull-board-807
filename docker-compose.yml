@@ -1,0 +1,47 @@
+version: '3'
+
+networks:
+  default:
+    driver: bridge
+
+services:
+  redis:
+    networks:
+      - default
+    image: redis
+    container_name: redis-tmv2
+
+  tmserver:
+    networks:
+      - default
+    environment:
+      - SERVER_NMP_MOCK_API=true
+      - NETWORK=hardhat
+      - environment=testnet
+      - REDISURL=redis://redis::6379
+    container_name: tmserver
+    build:
+      context: .
+      dockerfile:  ./dockerFiles/Dockerfile.server
+    volumes:
+      - ./:/usr/src/app
+    links:
+      - redis
+    ports:
+      - 3232:3232
+  jobapp:
+    ports:
+      - 9292:9292
+    networks:
+      - default
+    environment:
+      - SERVER_NMP_MOCK_API=true
+      - NETWORK=hardhat
+      - REDISURL=redis://redis::6379
+    build:
+      context: .
+      dockerfile:  ./dockerFiles/Dockerfile.queue
+    volumes:
+      - ./:/usr/src/app
+    links:
+      - redis
